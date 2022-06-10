@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\models\api;
+use Exception;
+use App\Helper\ApiHelper;
 
 class apiController extends Controller
 {
@@ -11,8 +13,7 @@ class apiController extends Controller
     public function ApiIndex()
     { 
         $data=api::all();
-        $headers=["status"=>"ok!"];
-        return response()->json($data, 200, $headers);
+        return ApiHelper::CreateApi("success", 200,$data);
     }
     #to read data from db by id
     public function ApiIndexId($id)
@@ -22,16 +23,32 @@ class apiController extends Controller
             $headers=['status'=>'404','message'=>"data not found"];
             return response()->json("not found!", 404, $headers);
         }
-            $headers=["status"=>"ok!"];
-            return response()->json($data, 200, $headers);
+            return ApiHelper::CreateApi("success", 200,$data);
     }
     #to create data 
+    
     public function ApiCreate(Request $request)
     {
-        $data=api::create($request->all());
-        $headers=["status"=>"ok!"];
-        return response()->json($data, 200, $headers);
+        try {
+            $validate=$request->validate([
+                "name"=>['required','min:3','max:255'],
+                "hobby"=>['required','min:3','max:255'],  
+                "address"=>['required','min:3','max:255']
+              ]);
+                // if($validate->error()){
+                //     $data=$validate->error()->get();
+                //     $headers=["status"=>"ok!"];
+                //     return response()->json($data, 200, $headers);
+                // }
+
+              $data=api::create($request->all());
+              return ApiHelper::CreateApi( 'success',200,$data);  
+        } catch (Exception $err) {
+            //throw $th;
+            return ApiHelper::CreateApi("internal server error!",500);
+        }
     }
+
     #to update data to db
     public function ApiUpdate(Request $request , $id )
     {

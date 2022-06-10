@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('hobby');
             $table->string('address');
             $table->timestamps();
+            #$table->string() memiliki default value yakni 255
+            #untuk kustom bisa seperti ini : $table->string(your_value); 
         });
     }
 
