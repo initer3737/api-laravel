@@ -12,17 +12,27 @@ class apiController extends Controller
     #to read data from db
     public function ApiIndex()
     { 
-        $data=api::all();
-        return ApiHelper::CreateApi("success", 200,$data);
+        try {
+            $data=api::all();
+            return ApiHelper::CreateApi("success", 200,$data);
+        } catch (Exception $err) {
+            //throw $th;
+            return ApiHelper::CreateApi("internal server error!",500);
+        }
     }
     #to read data from db by id
     public function ApiIndexId($id)
     { 
-        $data=api::find($id);
-        if(is_null($data)){
-            return ApiHelper::CreateApi("404 not found", 404);
+        try {
+            $data=api::find($id);
+            if(is_null($data)){
+                return ApiHelper::CreateApi("404 not found", 404);
+            }
+                return ApiHelper::CreateApi("success", 200,$data);
+        } catch (Exception $err) {
+            //throw $th;
+            return ApiHelper::CreateApi("internal server error!",500);
         }
-            return ApiHelper::CreateApi("success", 200,$data);
     }
     #to create data 
     
@@ -51,22 +61,32 @@ class apiController extends Controller
     #to update data to db
     public function ApiUpdate(Request $request , $id )
     {
-        $data=api::find($id);
-        if(is_null($data)){
-            #if the data is null then
-            return  ApiHelper::CreateApi("data not found!", 404);
+        try{
+            $data=api::find($id);
+            if(is_null($data)){
+                #if the data is null then
+                return  ApiHelper::CreateApi("data not found!", 404);
+            }
+            $data->update($request->all());
+            return ApiHelper::CreateApi("update successfully", 201,$data);
+        } catch (Exception $err) {
+        //throw $th;
+            return ApiHelper::CreateApi("internal server error!",500);
         }
-        $data->update($request->all());
-        return ApiHelper::CreateApi("update successfully", 201,$data);
     }
     #to delete data to db
     public function ApiDelete($id)
     {
-        $data=api::find($id);
-        $data->delete();
-        if(is_null($data)){
-            return ApiHelper::CreateApi("data not found!", 404);;
+       try {
+            $data=api::find($id);
+            $data->delete();
+            if(is_null($data)){
+                return ApiHelper::CreateApi("data not found!", 404);;
+            }
+            return ApiHelper::CreateApi("delete successfully!", 200);
+    } catch (Exception $err) {
+        //throw $th;
+            return ApiHelper::CreateApi("internal server error!",500);
         }
-        return ApiHelper::CreateApi("delete successfully!", 200);
     }
 }
