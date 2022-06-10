@@ -20,8 +20,7 @@ class apiController extends Controller
     { 
         $data=api::find($id);
         if(is_null($data)){
-            $headers=['status'=>'404','message'=>"data not found"];
-            return response()->json("not found!", 404, $headers);
+            return ApiHelper::CreateApi("404 not found", 404);
         }
             return ApiHelper::CreateApi("success", 200,$data);
     }
@@ -42,7 +41,7 @@ class apiController extends Controller
                 // }
 
               $data=api::create($request->all());
-              return ApiHelper::CreateApi( 'success',200,$data);  
+              return ApiHelper::CreateApi( 'success',201,$data);  
         } catch (Exception $err) {
             //throw $th;
             return ApiHelper::CreateApi("internal server error!",500);
@@ -55,26 +54,19 @@ class apiController extends Controller
         $data=api::find($id);
         if(is_null($data)){
             #if the data is null then
-            $headers=[
-                "status"=>"404 not found!",
-                "message"=>"data with id $id not found!"
-            ];
-            return response()->json(["message"=>"data with id $id is not found!"], 201, $headers);
+            return  ApiHelper::CreateApi("data not found!", 404);
         }
         $data->update($request->all());
-        $headers=["status"=>"ok!"];
-        return response()->json(["message"=>"update successfully {$data}"], 201, $headers);
+        return ApiHelper::CreateApi("update successfully", 201,$data);
     }
     #to delete data to db
     public function ApiDelete($id)
     {
         $data=api::find($id);
         $data->delete();
-        $headers=["status"=>"ok!"];
         if(is_null($data)){
-            $headers=["status"=>"404!"];
-            return response()->json(["message"=>"data not found"], 404, $headers);
+            return ApiHelper::CreateApi("data not found!", 404);;
         }
-        return response()->json(["message"=>"deleted successfully"], 200, $headers);
+        return ApiHelper::CreateApi("delete successfully!", 200);
     }
 }
