@@ -11,6 +11,15 @@ class ApiHelper{
         "data"=>null
     ];
 
+    static public function CreateApi($message=null,$statusCode=null,$data=null)
+    {
+        self::$response['meta']['message']=$message;
+        self::$response['meta']['status']=$statusCode;
+        self::$response['meta']['code']=$statusCode;
+        self::$response['data']=$data;
+       return response()->json(self::$response,self::$response['meta']['status']);
+    }
+
     static public function onSuccessApi($message="success",$statusCode=200,$data=null)
     {
         self::$response['meta']['message']=$message;

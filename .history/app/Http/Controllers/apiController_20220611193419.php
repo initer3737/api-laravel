@@ -27,7 +27,7 @@ class apiController extends Controller
         try {
             $data=api::find($id);
             if(is_null($data)){
-                return ApiHelper::onErrorApi("404 not found", 404,);
+                return ApiHelper::onErrorApi("404 not found", 404);
             }
                 return ApiHelper::onSuccessApi("success", 200,$data);
         } catch (Exception $err) {
@@ -60,7 +60,7 @@ class apiController extends Controller
             $data=api::find($id);
             if(is_null($data)){
                 #if the data is null then
-                return  ApiHelper::onErrorApi("data not found!", 404,);
+                return  ApiHelper::onErrorApi("data not found!", 404);
             }
             $data->update($request->all());
             return ApiHelper::onSuccessApi("update successfully", 201,$data);

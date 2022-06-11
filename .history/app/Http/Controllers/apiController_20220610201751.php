@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\models\api;
 use Exception;
 use App\Helper\ApiHelper;
-use App\Http\Controllers\Validator;
+use Illuminate\support\Facades\Validator;
 
 class apiController extends Controller
 {
@@ -15,7 +15,7 @@ class apiController extends Controller
     { 
         try {
             $data=api::all();
-            return ApiHelper::onSuccessApi("success", 200,$data);
+            return ApiHelper::onSuccessApi("success",200 ,$data);
         } catch (Exception $err) {
             //throw $th;
             return ApiHelper::onErrorApi("internal server error!",500,);
@@ -27,12 +27,12 @@ class apiController extends Controller
         try {
             $data=api::find($id);
             if(is_null($data)){
-                return ApiHelper::onErrorApi("404 not found", 404,);
+                return ApiHelper::onErrorApi("404 not found", 404);
             }
                 return ApiHelper::onSuccessApi("success", 200,$data);
         } catch (Exception $err) {
             //throw $th;
-            return ApiHelper::onErrorApi("internal server error!",500,);
+            return ApiHelper::onErrorApi("internal server error!",500);
         }
     }
     #to create data 
@@ -40,16 +40,28 @@ class apiController extends Controller
     public function ApiCreate(Request $request)
     {
         try {
-            $validate=$request->validate([
+            $validate=$request->validateWithBag([
                 "name"=>['required','min:3','max:255'],
                 "hobby"=>['required','min:3','max:255'],  
                 "address"=>['required','min:3','max:255']
               ]);
-            //   $data=api::create($request->all());
-              return ApiHelper::onSuccessApi( 'success!',201,dd($validate));  
+              $rule=[
+                "name"=>['required','min:3','max:255'],
+                "hobby"=>['required','min:3','max:255'],  
+                "address"=>['required','min:3','max:255']
+              ];
+             $validator=Validator::make($request->all(),$rule,[
+                "name.required"=>"tidak boleh kurang dari 3 karakter",
+             ]);
+                if($validator->errors()){
+                    return ApiHelper::onErrorApi($validator->errors(),400,);
+                }
+              //$data=api::create($request->all());
+              $data=null;
+              return ApiHelper::onSuccessApi( 'success',201,$data);  
         } catch (Exception $err) {
             //throw $th;
-            return ApiHelper::onErrorApi("internal server error!",500,);
+            return ApiHelper::onErrorApi("internal server error!",500);
         }
     }
 
@@ -60,13 +72,13 @@ class apiController extends Controller
             $data=api::find($id);
             if(is_null($data)){
                 #if the data is null then
-                return  ApiHelper::onErrorApi("data not found!", 404,);
+                return  ApiHelper::onErrorApi("data not found!", 404);
             }
             $data->update($request->all());
             return ApiHelper::onSuccessApi("update successfully", 201,$data);
         } catch (Exception $err) {
         //throw $th;
-            return ApiHelper::onErrorApi("internal server error!",500,);
+            return ApiHelper::onErrorApi("internal server error!",500);
         }
     }
     #to delete data to db

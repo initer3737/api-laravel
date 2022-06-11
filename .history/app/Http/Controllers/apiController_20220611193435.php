@@ -27,7 +27,7 @@ class apiController extends Controller
         try {
             $data=api::find($id);
             if(is_null($data)){
-                return ApiHelper::onErrorApi("404 not found", 404,);
+                return ApiHelper::onErrorApi("404 not found", 404);
             }
                 return ApiHelper::onSuccessApi("success", 200,$data);
         } catch (Exception $err) {

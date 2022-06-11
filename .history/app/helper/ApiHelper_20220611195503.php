@@ -26,7 +26,7 @@ class ApiHelper{
         self::$response['meta']['status']=$statusCode;
         self::$response['meta']['code']=$statusCode;
         self::$response['data']=$data;
-       return response()->json(self::$response,self::$response['meta']['status']);
+       return response()->json(self::$response[],self::$response['meta']['status']);
     }
 
 }
