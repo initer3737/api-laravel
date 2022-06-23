@@ -3,85 +3,60 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\models\api;
+use App\Http\Requests\CreateRequest;
 use Exception;
 use App\Helper\ApiHelper;
-use App\Http\Controllers\Validator;
-
+use Illuminate\Support\Facades\Validator;
+use  App\services\ApiService;
 class apiController extends Controller
 {
+    public function __construct(ApiService $service){
+       $this->service=$service;
+    }
     #to read data from db
     public function ApiIndex()
     { 
-        try {
-            $data=api::all();
+        try { 
+            $data=$this->service->index();
             return ApiHelper::onSuccessApi("success", 200,$data);
         } catch (Exception $err) {
-            //throw $th;
             return ApiHelper::onErrorApi("internal server error!",500,);
         }
     }
     #to read data from db by id
     public function ApiIndexId($id)
     { 
-        try {
-            $data=api::find($id);
+            $data=$this->service->get($id);
             if(is_null($data)){
                 return ApiHelper::onErrorApi("404 not found", 404,);
             }
                 return ApiHelper::onSuccessApi("success", 200,$data);
-        } catch (Exception $err) {
-            //throw $th;
-            return ApiHelper::onErrorApi("internal server error!",500,);
-        }
     }
     #to create data 
     
-    public function ApiCreate(Request $request)
+    public function ApiCreate(CreateRequest $request)
     {
-        try {
-            $validate=$request->validate([
-                "name"=>['required','min:3','max:255'],
-                "hobby"=>['required','min:3','max:255'],  
-                "address"=>['required','min:3','max:255']
-              ]);
-            //   $data=api::create($request->all());
-              return ApiHelper::onSuccessApi( 'success!',201,dd($validate));  
-        } catch (Exception $err) {
-            //throw $th;
-            return ApiHelper::onErrorApi("internal server error!",500,);
-        }
+        $data= $this->service->store($request->validated());
+        return ApiHelper::onSuccessApi( 'success!',201,$data);  
     }
 
     #to update data to db
-    public function ApiUpdate(Request $request , $id )
+    public function ApiUpdate(CreateRequest $request , $id )
     {
-        try{
-            $data=api::find($id);
+            $this->service->put($request->validated());
             if(is_null($data)){
                 #if the data is null then
                 return  ApiHelper::onErrorApi("data not found!", 404,);
             }
-            $data->update($request->all());
-            return ApiHelper::onSuccessApi("update successfully", 201,$data);
-        } catch (Exception $err) {
-        //throw $th;
-            return ApiHelper::onErrorApi("internal server error!",500,);
-        }
+            return ApiHelper::onSuccessApi("update successfully", 201,null);
     }
     #to delete data to db
     public function ApiDelete($id)
     {
-       try {
-            $data=api::find($id);
-            $data->delete();
+            $data=$this->service->delete($id);
             if(is_null($data)){
                 return ApiHelper::onErrorApi("data not found!", 404,);;
             }
             return ApiHelper::onSuccessApi("delete successfully!", 200,);
-    } catch (Exception $err) {
-        //throw $th;
-            return ApiHelper::onErrorApi("internal server error!",500,);
-        }
     }
 }
